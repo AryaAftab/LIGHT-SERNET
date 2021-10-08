@@ -1,0 +1,28 @@
+{
+    "IEMOCAP" : {
+        "Class" : {
+            "ang" : "angry",
+            "dis" : "disgust",
+            "exc" : "excited",
+            "fea" : "fear",
+            "fru" : "frustration",
+            "hap" : "happiness",
+            "neu" : "neutral",
+            "oth" : "other",
+            "sad" : "sadness",
+            "sur" : "surprise",
+            "xxx" : "unspecified"
+        }
+    },
+    "EMO-DB" : {
+        "Class" : {
+            "W" : "anger",
+            "L" : "boredom",
+            "E" : "disgust",
+            "A" : "anxiety_fear",
+            "F" : "happiness",
+            "T" : "sadness",
+            "N" : "neutral"
+        }
+    }
+}
