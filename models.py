@@ -7,7 +7,7 @@ from tensorflow.keras.models import Model
 
 import hyperparameters
 
-os.environ["CUDA_VISIBLE_DEVICES"] = "-1"
+#os.environ["CUDA_VISIBLE_DEVICES"] = "-1"
 
 
 
