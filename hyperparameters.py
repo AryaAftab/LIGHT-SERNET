@@ -1,7 +1,8 @@
+# Random Seed
 SEED = 42
 
 
-
+# Input Config
 INPUT_DURATIONS = 3
 
 NUM_SPECTROGRAM_BINS = 513
@@ -23,7 +24,7 @@ N_MFCC = 40
 
 
 
-
+# Training Config
 EPOCHS = 300
 
 BATCH_SIZE = 32
@@ -31,19 +32,21 @@ BATCH_SIZE = 32
 K_FOLD = 10
 
 
-
+# Regularizer Hyperparameter
 L2 = 1e-6
 DROPOUT = 0.3
 
 
+# Base Directory for Datasets
 BASE_DIRECTORY = "data"
 
 
-
+# Optimizer Config
 LEARNING_RATE = 1e-4
 LEARNING_RATE_DECAY_PARAMETERS = -0.15
 LEARNING_RATE_DECAY_STRATPOINT = 50
 LEARNING_RATE_DECAY_STEP = 20
 
 
+# Loss Config
 GAMMA = 2
