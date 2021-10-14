@@ -26,7 +26,7 @@ $ cd LIGHT-SERNET/
 
 ### 3. Data:
 * Download **EMO-DB** and **IEMOCAP** datasets
-* extract them in [data folder](https://github.com/AryaAftab/LIGHT-SERNET/tree/master/data)
+* extract them in [data](https://github.com/AryaAftab/LIGHT-SERNET/tree/master/data) folder
 ### 4. Prepare datasets :
 Use the following code to convert each dataset to the desired size(second):
 ```bash
@@ -42,7 +42,7 @@ You only need to change the constants in the [hyperparameters.py](https://github
 ### 6. Strat training:
 Use the following code to train the model on the desired dataset with the desired cost function.
 - Note 1: The database name is the name of the database folder after segmentation.
-- Note 2: The results for the confusion matrix are saved in the [result folder](https://github.com/AryaAftab/LIGHT-SERNET/tree/master/result).
+- Note 2: The results for the confusion matrix are saved in the [result](https://github.com/AryaAftab/LIGHT-SERNET/tree/master/result) folder.
 ```bash
 $ python train.py -dn {dataset_name_after_segmentation} -ln {cost_function_name}
 ```
