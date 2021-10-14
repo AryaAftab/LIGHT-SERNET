@@ -14,6 +14,7 @@ In this paper, we propose an efficient and lightweight fully convolutional neura
 ### 1. Clone Repository
 ```bash
 $ git clone https://github.com/AryaAftab/LIGHT-SERNET.git
+$ cd LIGHT-SERNET/
 ```
 ### 2. Requirements
 - Tensorflow >= 2.3.0
