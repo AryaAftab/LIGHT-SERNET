@@ -25,7 +25,7 @@ $ cd LIGHT-SERNET/
 - **FFmpeg (for audio segmentation)**
 
 ### 3. Data:
-* Download **EMO-DB** and **IEMOCAP** datasets
+* Download **[EMO-DB](http://emodb.bilderbar.info/download/download.zip)** and **IEMOCAP** datasets
 * extract them in [data](https://github.com/AryaAftab/LIGHT-SERNET/tree/master/data) folder
 ### 4. Prepare datasets :
 Use the following code to convert each dataset to the desired size(second):
