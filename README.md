@@ -5,7 +5,7 @@ This is the Tensorflow 2.x implementation of our paper ["Light-SERNet: A lightwe
 <div align=center>
 <img width=95% src="https://github.com/AryaAftab/LIGHT-SERNET/blob/master/pics/Architecture.png"/>
 </div>
-In this paper, we propose an efficient and lightweight fully convolutional neural network for speech emotion recognition in systems with limited hardware resources. In the proposed FCNN model, various feature maps are extracted via three parallel paths with different filter sizes. This helps deep convolution blocks to extract high-level features, while ensuring sufficient separability. The extracted features are used to classify the emotion of the input speech segment. While our model has a smaller size than that of the state-of-the-art models, it achieves a higher performance on the IEMOCAP and EMO-DB datasets.
+In this paper, we propose an efficient and lightweight fully convolutional neural network(FCNN) for speech emotion recognition in systems with limited hardware resources. In the proposed FCNN model, various feature maps are extracted via three parallel paths with different filter sizes. This helps deep convolution blocks to extract high-level features, while ensuring sufficient separability. The extracted features are used to classify the emotion of the input speech segment. While our model has a smaller size than that of the state-of-the-art models, it achieves a higher performance on the IEMOCAP and EMO-DB datasets.
 
 
 
@@ -22,7 +22,10 @@ $ cd LIGHT-SERNET/
 - Tqdm >= 4.50.2
 - Matplotlib> = 3.3.1
 - Scikit-learn >= 0.23.2
-- **FFmpeg (for audio segmentation)**
+
+```bash
+$ pip install -r requirements.txt
+```
 
 ### 3. Data:
 * Download **[EMO-DB](http://emodb.bilderbar.info/download/download.zip)** and **[IEMOCAP](https://sail.usc.edu/iemocap/iemocap_release.htm)**(requires permission to access) datasets
