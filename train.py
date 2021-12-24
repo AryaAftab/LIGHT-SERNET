@@ -2,6 +2,7 @@ import os
 import datetime
 import time
 import argparse
+import itertools
 
 import tensorflow as tf
 
