@@ -5,7 +5,7 @@ from tqdm import tqdm
 from utils import *
 from read_dataset import *
 
-#os.environ["CUDA_VISIBLE_DEVICES"] = "-1"
+os.environ["CUDA_VISIBLE_DEVICES"] = "-1"
 
 
 
@@ -29,7 +29,7 @@ ap.add_argument("-d", "--dataset_name",
 
 ap.add_argument("-l", "--segment_length",
                 default=3,
-                type=int,
+                type=float,
                 help="length of audio segmentation")
 
 ap.add_argument("-m", "--mode",
@@ -64,10 +64,10 @@ def segmentation(dataset_info, filename_generator, segment_length=3, segment_mod
         #for name, label in filename_generator:
             raw_data, fs = read_wave(name)
 
-            trimed_data = trim_wave(raw_data, segment_length=segment_length*fs, segment_mode=segment_mode)
-            for counter in range(0, len(trimed_data), segment_length*fs):
-                segment_data = trimed_data[counter:counter+segment_length*fs]
-                segment_data = normalize(segment_data, segment_length=segment_length*fs)
+            trimed_data = trim_wave(raw_data, segment_length=int(segment_length*fs), segment_mode=segment_mode)
+            for counter in range(0, len(trimed_data), int(segment_length*fs)):
+                segment_data = trimed_data[counter:counter+int(segment_length*fs)]
+                segment_data = normalize(segment_data, segment_length=int(segment_length*fs))
 
                 filename = os.path.basename(name)
                 filename = filename.split('.')[0]
@@ -80,6 +80,7 @@ def segmentation(dataset_info, filename_generator, segment_length=3, segment_mod
                     filename = segmented_directory_format.format(label, filename + name.split('/')[-2], counter)
 
                 write_wave(segment_data, filename, fs)
+        cleaning_directory_filename(directory)
 
 
 

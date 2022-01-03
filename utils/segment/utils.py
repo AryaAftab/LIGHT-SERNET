@@ -1,7 +1,9 @@
 import numpy as np
+from sklearn.utils import shuffle
 import tensorflow as tf
 import json
 import os
+from glob import glob
 import sys
 
 
@@ -133,6 +135,22 @@ def read_wave(wave_path):
     raw_data = np.squeeze(raw_data.numpy())
     return raw_data, fs.numpy()
 
+
+def cleaning_directory_filename(directory):
+    ## This function clean dataset filenames
+    #
+    # input : 
+    #   directory : directory of dataset
+
+    folders = os.listdir(directory)
+    for folder in folders:
+        filenames = glob(os.path.join(directory, f"{folder}/*.wav"))
+        clean_filenames = shuffle(filenames.copy())
+        for filename, clean_filename in zip(filenames, clean_filenames):
+            buff = clean_filename.split("/")
+            buff[-1] = buff[-1].replace("_", "")
+            clean_filename = "/".join(buff)
+            os.rename(filename, clean_filename)
 
 
 def write_wave(data, wave_path, fs):
