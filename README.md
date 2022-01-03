@@ -47,11 +47,11 @@ Use the following code to train the model on the desired dataset with the desire
 - Note 1: The database name is the name of the database folder after segmentation.
 - Note 2: The results for the confusion matrix are saved in the [result](https://github.com/AryaAftab/LIGHT-SERNET/tree/master/result) folder.
 ```bash
-$ python train.py -dn {dataset_name_after_segmentation} -ln {cost_function_name}
+$ python train.py -dn {dataset_name_after_segmentation} -id {input durations} -ln {cost_function_name} -v {verbose}
 ```
 For example, for EMO-DB Dataset :
 ```bash
-$ python train.py -dn EMO-DB_3s_Segmented -ln focal
+$ python train.py -dn EMO-DB_3s_Segmented -id 3  -ln focal -v 1
 ```
 
 ## Citation

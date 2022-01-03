@@ -123,7 +123,16 @@ def split_dataset(dataset_name, audio_type=None):
     
     dataset_name = os.path.join(hyperparameters.BASE_DIRECTORY, dataset_name)
     
+    if "IEMOCAP" in dataset_name:
+        labels_list = np.array(tf.io.gfile.listdir(str(dataset_name)))
+        if len(labels_list) != 4:
+            seperate_iemocap_class(dataset_name,
+                                   target_classes=['angry', 'neutral', 'sadness'],
+                                   merge_classes=['happiness', 'excited'])
+                
+    
     filenames = tf.io.gfile.glob(str(dataset_name) + '/*/*')
+
     
 
     if "IEMOCAP" in dataset_name:

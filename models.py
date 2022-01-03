@@ -13,7 +13,7 @@ import hyperparameters
 
 
 def Light_SERNet_V1(output_class,
-                    input_duration=hyperparameters.INPUT_DURATIONS,
+                    input_duration=hyperparameters,
                     frame_length=hyperparameters.FFT_LENGTH,
                     frame_step=hyperparameters.FRAME_STEP,
                     fs=hyperparameters.SAMPLE_RATE,

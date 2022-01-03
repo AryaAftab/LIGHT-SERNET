@@ -41,6 +41,11 @@ ap.add_argument("-dn", "--dataset_name",
                 type=str,
                 help="dataset name")
 
+ap.add_argument("-id", "--input_durations",
+                required=True,
+                type=float,
+                help="input durations(sec)")
+
 ap.add_argument("-at", "--audio_type",
                 default="None",
                 type=str,
@@ -60,6 +65,7 @@ args = vars(ap.parse_args())
 
 
 dataset_name = args["dataset_name"]
+input_durations = args["input_durations"]
 audio_type = args["audio_type"]
 loss_name = args["loss_name"]
 verbose = args["verbose"]
@@ -110,7 +116,7 @@ for counter in range (hyperparameters.K_FOLD):
     train_dataset, test_dataset = make_dataset_with_cache(dataset_name, Filenames, Splited_Index, Labels_list, Index_Selection_Fold[counter])
 
 
-    model = models.Light_SERNet_V1(len(Labels_list))
+    model = models.Light_SERNet_V1(len(Labels_list), input_durations)
 
 
     if loss_name == "cross_entropy":
@@ -216,18 +222,21 @@ Report = classification_report(Actual_targets,
                                Predicted_targets,
                                target_names=list(Labels_list),
                                digits=4)
+
 print(Report)
+with open(f"result/{dataset_name}_{loss_name}_Report.txt", "w") as f:
+    f.write(Report)
 
 
 plt.figure(figsize=(15,10))
 cm = confusion_matrix(Actual_targets, Predicted_targets, labels=range(len(Labels_list)))
 plot_confusion_matrix(cm, list(Labels_list), normalize=False)
-plt.savefig(f"result/{dataset_name}_TotalConfusionMatrix.pdf", bbox_inches='tight')
+plt.savefig(f"result/{dataset_name}_{loss_name}_TotalConfusionMatrix.pdf", bbox_inches='tight')
 plt.show()
 
 plt.figure(figsize=(15,10))
 plot_confusion_matrix(cm, list(Labels_list), normalize=True)
-plt.savefig(f"result/{dataset_name}_TotalConfusionMatrixNormalized.pdf", bbox_inches='tight')
+plt.savefig(f"result/{dataset_name}_{loss_name}_TotalConfusionMatrixNormalized.pdf", bbox_inches='tight')
 plt.show()
 
 ##############################################################################################################
