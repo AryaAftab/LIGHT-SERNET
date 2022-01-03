@@ -2,6 +2,7 @@ import os
 from glob import glob
 from tqdm import tqdm
 
+import numpy as np
 import tensorflow as tf
 
 import hyperparameters
@@ -40,16 +41,16 @@ def seperate_iemocap_class(dataset_folder_path, target_classes=['angry', 'neutra
 
 
 
-def filter_iemocap(filenames, audio_type='None'):
+def filter_iemocap(filenames, audio_type="all"):
     '''
     audio type = {
-      None : for all data,
+      all : for all data,
       impro : for improsived part,
       script : for scripted part
     }
     '''
     
-    if audio_type is 'None':
+    if audio_type == "all":
         return tf.stack(filenames)
     
     buff_filenames = []
@@ -58,3 +59,67 @@ def filter_iemocap(filenames, audio_type='None'):
             buff_filenames.append(filename)
     
     return tf.stack(buff_filenames)
+
+
+
+def seperate_speaker_id_emodb(filenames):
+    list_of_speaker_ids = ["03", "08", "09", "10", "11", "12", "13", "14", "15", "16"]
+    
+    
+    splited_index = []
+    for speaker_id in list_of_speaker_ids:
+        buff = []
+        for counter, filename in enumerate(filenames):
+            filename_id = os.path.basename(str(filename))[:2]
+            if filename_id == speaker_id:
+                buff.append(counter)
+        splited_index.append(np.array(buff))
+
+
+    val_test_splited_index = []
+    for counter in range(len(list_of_speaker_ids)):
+        test_index_id = counter
+        val_index_id = np.random.randint(1, len(list_of_speaker_ids))
+        val_index_id = (val_index_id + test_index_id) % len(list_of_speaker_ids)
+
+        val_test_splited_index.append([splited_index[val_index_id], splited_index[test_index_id]])
+
+    
+    return val_test_splited_index
+
+
+
+def seperate_speaker_id_iemocap(filenames):
+    
+    speaker_format = "Ses0{}{}"
+    
+    list_of_speaker_ids = []
+    for n_session in range(5):
+        for sex in ["F", "M"]:
+            list_of_speaker_ids.append(speaker_format.format(n_session + 1, sex))
+    
+    
+    
+    splited_index = []
+    for speaker_id in list_of_speaker_ids:
+        buff = []
+        for counter, filename in enumerate(filenames):
+            filename_id = os.path.basename(str(filename))
+            filename_id = filename_id[:6]
+            if filename_id == speaker_id:
+                buff.append(counter)
+        splited_index.append(np.array(buff))
+
+
+    val_test_splited_index = []
+    for counter in range(len(list_of_speaker_ids) // 2):
+        test_index_id = 2 * counter
+        val_index_id = 2 * counter + 1
+        val_test_splited_index.append([splited_index[val_index_id], splited_index[test_index_id]])
+
+        test_index_id = 2 * counter + 1
+        val_index_id = 2 * counter
+        val_test_splited_index.append([splited_index[val_index_id], splited_index[test_index_id]])
+
+    
+    return val_test_splited_index
