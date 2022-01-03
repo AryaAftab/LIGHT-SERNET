@@ -2,13 +2,10 @@ import os
 import datetime
 import time
 import argparse
-import itertools
 
 import tensorflow as tf
 
-
-from sklearn.metrics import classification_report
-from sklearn.metrics import confusion_matrix, ConfusionMatrixDisplay
+from sklearn.metrics import classification_report, confusion_matrix, accuracy_score
 
 
 from dataio import *
@@ -47,19 +44,24 @@ ap.add_argument("-id", "--input_durations",
                 help="input durations(sec)")
 
 ap.add_argument("-at", "--audio_type",
-                default="None",
+                default="all",
                 type=str,
                 help="auido type to filter dataset(IEMOCAP)")
 
 ap.add_argument("-ln", "--loss_name",
                 default="cross_entropy",
                 type=str,
-                help="loss for training")
+                help="cost function name for training")
 
 ap.add_argument("-v", "--verbose",
                 default=1,
                 type=int,
                 help="verbose for training bar")
+
+ap.add_argument("-it", "--input_type",
+                default="mfcc",
+                type=str,
+                help="type of input(mfcc, spectrogram, mel_spectrogram)")
 
 args = vars(ap.parse_args())
 
@@ -69,7 +71,22 @@ input_durations = args["input_durations"]
 audio_type = args["audio_type"]
 loss_name = args["loss_name"]
 verbose = args["verbose"]
+input_type = args["input_type"]
 
+
+
+
+
+
+print(".................................. Segment Dataset Started .......................................")
+Segmented_datasetname_format = "{}_{:.1f}s_Segmented"
+
+buff = Segmented_datasetname_format.format(dataset_name, input_durations)
+buff = f"{hyperparameters.BASE_DIRECTORY}/{buff}"
+if not os.path.exists(buff):
+    os.system(f"python utils/segment/segment_dataset.py -dp data/{dataset_name} -ip utils/DATASET_INFO.json -d {dataset_name} -l {input_durations} -m 1")
+dataset_name = Segmented_datasetname_format.format(dataset_name, input_durations)
+print(".................................. Segment Dataset finished ......................................")
 
 
 
@@ -84,8 +101,7 @@ Predicted_targets = np.array([])
 Actual_targets = np.array([])
 
 
-Index_Selection_Fold = np.array(list(itertools.combinations(range(hyperparameters.K_FOLD),2)))
-Index_Selection_Fold = np.random.permutation(Index_Selection_Fold)[:hyperparameters.K_FOLD]
+
 Filenames, Splited_Index, Labels_list = split_dataset(dataset_name, audio_type=audio_type)
 
 
@@ -113,10 +129,16 @@ for counter in range (hyperparameters.K_FOLD):
     
 
     
-    train_dataset, test_dataset = make_dataset_with_cache(dataset_name, Filenames, Splited_Index, Labels_list, Index_Selection_Fold[counter])
+    train_dataset, validation_dataset, test_dataset = make_dataset_with_cache(dataset_name=dataset_name,
+                                                                              filenames=Filenames,
+                                                                              val_test_splited_index=Splited_Index,
+                                                                              labels_list=Labels_list,
+                                                                              index_selection_fold=counter,
+                                                                              input_type=input_type,
+                                                                              maker=True)
+    
 
-
-    model = models.Light_SERNet_V1(len(Labels_list), input_durations)
+    model = models.Light_SERNet_V1(len(Labels_list), input_durations, input_type)
 
 
     if loss_name == "cross_entropy":
@@ -134,13 +156,13 @@ for counter in range (hyperparameters.K_FOLD):
               metrics=['accuracy']) 
     
     
+    steps_per_epoch = (len(Filenames) - len(Splited_Index[counter])) // hyperparameters.BATCH_SIZE + 1
     history = model.fit(train_dataset,
-                        steps_per_epoch=int(0.8 * len(Filenames) / hyperparameters.BATCH_SIZE),
+                        steps_per_epoch=steps_per_epoch,
                         epochs=hyperparameters.EPOCHS,
-                        validation_data=test_dataset,
+                        validation_data=validation_dataset,
                         callbacks=[learningrate_scheduler, return_bestweight],
                         verbose=verbose)
-    
     
     
     
@@ -173,6 +195,8 @@ for counter in range (hyperparameters.K_FOLD):
 
     Predicted_targets = np.append(Predicted_targets, Prediction)
     Actual_targets = np.append(Actual_targets, BuffY)
+
+    print("Test Accuracy : ", accuracy_score(BuffY, Prediction))
     #########################################################################################################
     
 
@@ -183,7 +207,13 @@ for counter in range (hyperparameters.K_FOLD):
 
 
 ###################################### prepare the test part related to the best model ##########################################
-_, test_dataset = make_dataset_with_cache(dataset_name, Filenames, Splited_Index, Labels_list, Index_Selection_Fold[best_counter])
+_, _, test_dataset = make_dataset_with_cache(dataset_name=dataset_name,
+                                             filenames=Filenames,
+                                             val_test_splited_index=Splited_Index,
+                                             labels_list=Labels_list,
+                                             index_selection_fold=best_counter,
+                                             input_type=input_type,
+                                             maker=True)
 BuffX = []
 BuffY = []
 for buff in test_dataset:
@@ -194,21 +224,21 @@ BuffY = tf.concat(BuffY, axis=0).numpy()
 #################################################################################################################################
 
 ###################### Save Best Model in tflite format (Weight Precision : Float32) #########################
-best_modelname_float32 = f"model/{dataset_name}_float32.tflite"
+best_modelname_float32 = f"model/{dataset_name}_{loss_name}_float32.tflite"
 save_float32(best_model, best_modelname_float32)
 
 evaluate_model(best_modelname_float32, "float32", BuffX, BuffY)
 ##############################################################################################################
 
 ###################### Save Best Model in tflite format (Weight Precision : Float16) #########################
-best_modelname_float16 = f"model/{dataset_name}_float16.tflite"
+best_modelname_float16 = f"model/{dataset_name}_{loss_name}_float16.tflite"
 save_float16(best_model, best_modelname_float16)
 
 evaluate_model(best_modelname_float16, "float16", BuffX, BuffY)
 ##############################################################################################################
 
 ###################### Save Best Model in tflite format (Weight Precision : Int8) ############################
-best_modelname_int8 = f"model/{dataset_name}_int8.tflite"
+best_modelname_int8 = f"model/{dataset_name}_{loss_name}_int8.tflite"
 save_int8(best_model, best_modelname_int8)
 
 evaluate_model(best_modelname_int8, "int8", BuffX, BuffY)

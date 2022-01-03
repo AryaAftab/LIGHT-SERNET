@@ -13,16 +13,25 @@ import hyperparameters
 
 
 def Light_SERNet_V1(output_class,
-                    input_duration=hyperparameters,
-                    frame_length=hyperparameters.FFT_LENGTH,
-                    frame_step=hyperparameters.FRAME_STEP,
-                    fs=hyperparameters.SAMPLE_RATE,
-                    n_mfcc=hyperparameters.N_MFCC):
+                    input_duration,
+                    input_type="mfcc"):
+
+    
+    number_of_frame = (int(input_duration * hyperparameters.SAMPLE_RATE) - hyperparameters.FRAME_LENGTH + hyperparameters.FRAME_STEP) // hyperparameters.FRAME_STEP
+    if input_type == "mfcc":
+        number_of_feature = hyperparameters.N_MFCC
+        number_of_channel = 1
+    elif input_type == "spectrogram":
+        number_of_feature = hyperparameters.NUM_SPECTROGRAM_BINS
+        number_of_channel = 1
+    elif input_type == "mel_spectrogram":
+        number_of_feature = hyperparameters.NUM_MEL_BINS
+        number_of_channel = 1
+    else:
+        raise ValueError('input_type not Valid!')
 
 
-
-    number_of_frame = (input_duration * fs - frame_length + frame_step) // frame_step
-    body_input = layers.Input(shape=(number_of_frame, n_mfcc, 1))
+    body_input = layers.Input(shape=(number_of_frame, number_of_feature, number_of_channel))
 
     path1 = layers.Conv2D(32, (11,1), padding="same", strides=(1,1))(body_input)
     path2 = layers.Conv2D(32, (1, 9), padding="same", strides=(1,1))(body_input)
