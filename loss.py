@@ -1,9 +1,12 @@
+import os
 import itertools
 from typing import Any, Optional
 
 import tensorflow as tf
 
+
 #os.environ["CUDA_VISIBLE_DEVICES"] = "-1"
+
 
 _EPSILON = tf.keras.backend.epsilon()
 

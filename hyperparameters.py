@@ -3,6 +3,7 @@ SEED = 42
 
 
 # Input Config
+
 NUM_SPECTROGRAM_BINS = 513
 
 NUM_MEL_BINS = 128
