@@ -8,6 +8,9 @@ This is the Tensorflow 2.x implementation of our paper ["Light-SERNet: A lightwe
 In this paper, we propose an efficient and lightweight fully convolutional neural network(FCNN) for speech emotion recognition in systems with limited hardware resources. In the proposed FCNN model, various feature maps are extracted via three parallel paths with different filter sizes. This helps deep convolution blocks to extract high-level features, while ensuring sufficient separability. The extracted features are used to classify the emotion of the input speech segment. While our model has a smaller size than that of the state-of-the-art models, it achieves a higher performance on the IEMOCAP and EMO-DB datasets.
 
 
+## Demo
+Demo on EMO-DB dataset: 
+[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/AryaAftab/LIGHT-SERNET/blob/master/Demo_Light_SERNet.ipynb)
 
 
 ## Run
