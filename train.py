@@ -177,7 +177,7 @@ for counter in range (hyperparameters.K_FOLD):
     if threshold < max(history.history["val_accuracy"]):
         History = history.history
         threshold = max(history.history["val_accuracy"])
-        best_model = tf.keras.models.clone_model(model)
+        best_weights = model.get_weights()
         best_counter = counter
 
     Result.append(buff)
@@ -222,23 +222,25 @@ BuffX = tf.concat(BuffX, axis=0).numpy()
 BuffY = tf.concat(BuffY, axis=0).numpy()
 #################################################################################################################################
 
+
+model.set_weights(best_weights)
 ###################### Save Best Model in tflite format (Weight Precision : Float32) #########################
 best_modelname_float32 = f"model/{dataset_name}_{loss_name}_float32.tflite"
-save_float32(best_model, best_modelname_float32)
+save_float32(model, best_modelname_float32)
 
 evaluate_model(best_modelname_float32, "float32", BuffX, BuffY)
 ##############################################################################################################
 
 ###################### Save Best Model in tflite format (Weight Precision : Float16) #########################
 best_modelname_float16 = f"model/{dataset_name}_{loss_name}_float16.tflite"
-save_float16(best_model, best_modelname_float16)
+save_float16(model, best_modelname_float16)
 
 evaluate_model(best_modelname_float16, "float16", BuffX, BuffY)
 ##############################################################################################################
 
 ###################### Save Best Model in tflite format (Weight Precision : Int8) ############################
 best_modelname_int8 = f"model/{dataset_name}_{loss_name}_int8.tflite"
-save_int8(best_model, best_modelname_int8)
+save_int8(model, best_modelname_int8)
 
 evaluate_model(best_modelname_int8, "int8", BuffX, BuffY)
 ##############################################################################################################
