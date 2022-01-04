@@ -261,11 +261,11 @@ plt.figure(figsize=(15,10))
 cm = confusion_matrix(Actual_targets, Predicted_targets, labels=range(len(Labels_list)))
 plot_confusion_matrix(cm, list(Labels_list), normalize=False)
 plt.savefig(f"result/{dataset_name}_{loss_name}_TotalConfusionMatrix.pdf", bbox_inches='tight')
-plt.show()
+#plt.show()
 
 plt.figure(figsize=(15,10))
 plot_confusion_matrix(cm, list(Labels_list), normalize=True)
 plt.savefig(f"result/{dataset_name}_{loss_name}_TotalConfusionMatrixNormalized.pdf", bbox_inches='tight')
-plt.show()
+#plt.show()
 
 ##############################################################################################################
