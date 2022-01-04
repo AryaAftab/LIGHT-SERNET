@@ -75,17 +75,8 @@ def seperate_speaker_id_emodb(filenames):
                 buff.append(counter)
         splited_index.append(np.array(buff))
 
-
-    val_test_splited_index = []
-    for counter in range(len(list_of_speaker_ids)):
-        test_index_id = counter
-        val_index_id = np.random.randint(1, len(list_of_speaker_ids))
-        val_index_id = (val_index_id + test_index_id) % len(list_of_speaker_ids)
-
-        val_test_splited_index.append([splited_index[val_index_id], splited_index[test_index_id]])
-
     
-    return val_test_splited_index
+    return splited_index
 
 
 
@@ -110,16 +101,5 @@ def seperate_speaker_id_iemocap(filenames):
                 buff.append(counter)
         splited_index.append(np.array(buff))
 
-
-    val_test_splited_index = []
-    for counter in range(len(list_of_speaker_ids) // 2):
-        test_index_id = 2 * counter
-        val_index_id = 2 * counter + 1
-        val_test_splited_index.append([splited_index[val_index_id], splited_index[test_index_id]])
-
-        test_index_id = 2 * counter + 1
-        val_index_id = 2 * counter
-        val_test_splited_index.append([splited_index[val_index_id], splited_index[test_index_id]])
-
     
-    return val_test_splited_index
+    return splited_index

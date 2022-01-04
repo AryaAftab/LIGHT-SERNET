@@ -129,13 +129,13 @@ for counter in range (hyperparameters.K_FOLD):
     
 
     
-    train_dataset, validation_dataset, test_dataset = make_dataset_with_cache(dataset_name=dataset_name,
-                                                                              filenames=Filenames,
-                                                                              val_test_splited_index=Splited_Index,
-                                                                              labels_list=Labels_list,
-                                                                              index_selection_fold=counter,
-                                                                              input_type=input_type,
-                                                                              maker=True)
+    train_dataset, test_dataset = make_dataset_with_cache(dataset_name=dataset_name,
+                                                          filenames=Filenames,
+                                                          splited_index=Splited_Index,
+                                                          labels_list=Labels_list,
+                                                          index_selection_fold=counter,
+                                                          input_type=input_type,
+                                                          maker=True)
     
 
     model = models.Light_SERNet_V1(len(Labels_list), input_durations, input_type)
@@ -160,7 +160,7 @@ for counter in range (hyperparameters.K_FOLD):
     history = model.fit(train_dataset,
                         steps_per_epoch=steps_per_epoch,
                         epochs=hyperparameters.EPOCHS,
-                        validation_data=validation_dataset,
+                        validation_data=test_dataset,
                         callbacks=[learningrate_scheduler, return_bestweight],
                         verbose=verbose)
     
@@ -180,9 +180,8 @@ for counter in range (hyperparameters.K_FOLD):
         best_model = tf.keras.models.clone_model(model)
         best_counter = counter
 
-
     Result.append(buff)
-    print("Validation Accuracy : ", buff[3])
+
 
     BuffX = []
     BuffY = []
@@ -207,13 +206,13 @@ for counter in range (hyperparameters.K_FOLD):
 
 
 ###################################### prepare the test part related to the best model ##########################################
-_, _, test_dataset = make_dataset_with_cache(dataset_name=dataset_name,
-                                             filenames=Filenames,
-                                             val_test_splited_index=Splited_Index,
-                                             labels_list=Labels_list,
-                                             index_selection_fold=best_counter,
-                                             input_type=input_type,
-                                             maker=True)
+_, test_dataset = make_dataset_with_cache(dataset_name=dataset_name,
+                                          filenames=Filenames,
+                                          splited_index=Splited_Index,
+                                          labels_list=Labels_list,
+                                          index_selection_fold=best_counter,
+                                          input_type=input_type,
+                                          maker=True)
 BuffX = []
 BuffY = []
 for buff in test_dataset:

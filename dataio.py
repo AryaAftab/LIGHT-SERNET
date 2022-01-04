@@ -144,50 +144,43 @@ def split_dataset(dataset_name, audio_type="all"):
         filenames = tf.random.shuffle(filenames)
         num_samples = len(filenames)
         labels_list = np.array(tf.io.gfile.listdir(str(dataset_name)))
-        val_test_splited_index = seperate_speaker_id_iemocap(filenames)
+        splited_index = seperate_speaker_id_iemocap(filenames)
     else:
         filenames = tf.random.shuffle(filenames)
         num_samples = len(filenames)
         labels_list = np.array(tf.io.gfile.listdir(str(dataset_name)))
-        val_test_splited_index = seperate_speaker_id_emodb(filenames)
+        splited_index = seperate_speaker_id_emodb(filenames)
         
-    return filenames, val_test_splited_index, labels_list
+    return filenames, splited_index, labels_list
 
 
 
 
 
-def make_dataset_with_cache(dataset_name, filenames, val_test_splited_index, labels_list, index_selection_fold, input_type="mfcc", maker=False):
+def make_dataset_with_cache(dataset_name, filenames, splited_index, labels_list, index_selection_fold, input_type="mfcc", maker=False):
 
     cache_directory = f"{hyperparameters.BASE_DIRECTORY}/Cache/{dataset_name}"
     os.system(f"rm -rf {cache_directory}")
 
     train_cache_directory = os.path.join(cache_directory, "train")
-    validation_cache_directory = os.path.join(cache_directory, "validation")
     test_cache_directory = os.path.join(cache_directory, "test")
 
     os.makedirs(train_cache_directory, exist_ok=True)
-    os.makedirs(validation_cache_directory, exist_ok=True)
     os.makedirs(test_cache_directory, exist_ok=True)
 
 
-    validation_index = val_test_splited_index[index_selection_fold][0]
-    test_index = val_test_splited_index[index_selection_fold][1]
+    test_index = splited_index[index_selection_fold]
 
-    val_test_index = np.concatenate((validation_index, test_index))
-    train_index = np.setdiff1d(np.arange(len(filenames)), val_test_index)
+    train_index = np.setdiff1d(np.arange(len(filenames)), test_index)
 
 
     train_files = tf.gather(filenames, train_index)
-    validation_files = tf.gather(filenames, validation_index)
     test_files = tf.gather(filenames, test_index)
 
 
     train_dataset = preprocess_dataset(train_files, labels_list, input_type)
     train_dataset = train_dataset.cache(train_cache_directory + "/file")
 
-    validation_dataset = preprocess_dataset(validation_files, labels_list, input_type)
-    validation_dataset = validation_dataset.cache(validation_cache_directory+ "/file")
 
     test_dataset = preprocess_dataset(test_files, labels_list, input_type)
     test_dataset = test_dataset.cache(test_cache_directory+ "/file")
@@ -196,13 +189,10 @@ def make_dataset_with_cache(dataset_name, filenames, val_test_splited_index, lab
 
     train_dataset = train_dataset.shuffle(len(train_files)).repeat()
     train_dataset = train_dataset.batch(hyperparameters.BATCH_SIZE).prefetch(AUTOTUNE)
-
-    validation_dataset = validation_dataset.batch(hyperparameters.BATCH_SIZE).prefetch(AUTOTUNE)
     
     test_dataset = test_dataset.batch(hyperparameters.BATCH_SIZE).prefetch(AUTOTUNE)
 
     if maker: 
-        list(validation_dataset.as_numpy_iterator()) 
         list(test_dataset.as_numpy_iterator()) 
 
-    return train_dataset, validation_dataset, test_dataset
+    return train_dataset, test_dataset
