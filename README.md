@@ -68,7 +68,7 @@ python train.py -dn "IEMOCAP" \
                 -v 1 \
                 -it "mfcc"
 ```
-**Note : For all experiment just run ```run.sh```**
+**Note : For all experiments just run ```run.sh```**
 ```bash
 sh run.sh
 ```
