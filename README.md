@@ -51,22 +51,26 @@ $ python train.py -dn {dataset_name} \
 
 EMO-DB Dataset:
 ```bash
-$ python train.py -dn "EMO-DB" \
-                  -id 3 \
-                  -at "all" \
-                  -ln "focal" \
-                  -v 1 \
-                  -it "mfcc"
+python train.py -dn "EMO-DB" \
+                -id 3 \
+                -at "all" \
+                -ln "focal" \
+                -v 1 \
+                -it "mfcc"
 ```
 
 IEMOCAP Dataset:
 ```bash
-$ python train.py -dn "IEMOCAP" \
-                  -id 7 \
-                  -at "impro" \
-                  -ln "cross_entropy" \
-                  -v 1 \
-                  -it "mfcc"
+python train.py -dn "IEMOCAP" \
+                -id 7 \
+                -at "impro" \
+                -ln "cross_entropy" \
+                -v 1 \
+                -it "mfcc"
+```
+**Note : For all experiment just run ```run.sh```**
+```bash
+sh run.sh
 ```
 
 ## Citation
