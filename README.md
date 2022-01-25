@@ -1,6 +1,6 @@
 # Light-SERNet
 
-This is the Tensorflow 2.x implementation of our paper ["Light-SERNet: A lightweight fully convolutional neural network for speech emotion recognition"](https://arxiv.org/abs/2110.03435), submitted in ICASSP 2022. 
+This is the Tensorflow 2.x implementation of our paper ["Light-SERNet: A lightweight fully convolutional neural network for speech emotion recognition"](https://arxiv.org/abs/2110.03435), accepted in ICASSP 2022. 
 
 <div align=center>
 <img width=95% src="./pics/Architecture.png"/>
