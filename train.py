@@ -117,15 +117,7 @@ for counter in range (hyperparameters.K_FOLD):
     learningrate_scheduler = LearningRateScheduler()
 
     
-    return_bestweight = ReturnBestEarlyStopping(
-        monitor='val_accuracy',
-        min_delta=0,
-        patience=10000,
-        verbose=0,
-        mode='max',
-        baseline=None,
-        restore_best_weights=True
-    )
+    return_bestweight = BestModelWeights()
     
 
     
