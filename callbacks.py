@@ -15,7 +15,7 @@ import hyperparameters
 
 
 
- class BestModelWeights(tf.keras.callbacks.Callback):
+class BestModelWeights(tf.keras.callbacks.Callback):
     def initial(self):
         self.best_val_loss = 0.0
         self.best_epoch = 0
