@@ -15,18 +15,24 @@ import hyperparameters
 
 
 
-class ReturnBestEarlyStopping(tf.keras.callbacks.EarlyStopping):
-    def __init__(self, **kwargs):
-        super(ReturnBestEarlyStopping, self).__init__(**kwargs)
+ class BestModelWeights(tf.keras.callbacks.Callback):
+    def initial(self):
+        self.best_val_loss = 0.0
+        self.best_epoch = 0
+        self.model_best_weights = None
+        
+    def on_epoch_end(self, epoch, logs=None):
+        if epoch == 0:
+            self.initial()
+        
+        if self.best_val_loss <= logs["val_accuracy"]:
+            self.model_best_weights = self.model.get_weights()
+            self.best_val_loss = logs["val_accuracy"]
+            self.best_epoch = epoch
 
     def on_train_end(self, logs=None):
-        if self.stopped_epoch > 0:
-            if self.verbose > 0:
-                print(f'\nEpoch {self.stopped_epoch + 1}: early stopping')
-        elif self.restore_best_weights:
-            if self.verbose > 0:
-                print('Restoring model weights from the end of the best epoch.')
-            self.model.set_weights(self.best_weights)
+        self.model.set_weights(self.model_best_weights)
+        print(f"Best weights is set, Best Epoch was : {self.best_epoch}")
 
 
 
