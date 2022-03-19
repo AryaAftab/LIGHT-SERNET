@@ -116,9 +116,11 @@ for counter in range (hyperparameters.K_FOLD):
 
     learningrate_scheduler = LearningRateScheduler()
 
-    
     return_bestweight = BestModelWeights()
     
+    callbacks = [learningrate_scheduler, return_bestweight]
+    if verbose == 0:
+        callbacks += [ShowProgress(hyperparameters.EPOCHS)]
 
     
     train_dataset, test_dataset = make_dataset_with_cache(dataset_name=dataset_name,
@@ -153,7 +155,7 @@ for counter in range (hyperparameters.K_FOLD):
                         steps_per_epoch=steps_per_epoch,
                         epochs=hyperparameters.EPOCHS,
                         validation_data=test_dataset,
-                        callbacks=[learningrate_scheduler, return_bestweight],
+                        callbacks=callbacks,
                         verbose=verbose)
     
     
