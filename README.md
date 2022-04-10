@@ -49,6 +49,7 @@ $ python train.py -dn {dataset_name} \
                   -ln {cost function name} \
                   -v {verbose for training bar} \
                   -it {type of input(mfcc, spectrogram, mel_spectrogram)}
+                  -c {type of cache(disk, ram, None)}
 ```
 #### Example:
 
@@ -60,6 +61,7 @@ python train.py -dn "EMO-DB" \
                 -ln "focal" \
                 -v 1 \
                 -it "mfcc"
+                -c "disk"
 ```
 
 IEMOCAP Dataset:
@@ -70,6 +72,7 @@ python train.py -dn "IEMOCAP" \
                 -ln "cross_entropy" \
                 -v 1 \
                 -it "mfcc"
+                -c "disk"
 ```
 **Note : For all experiments just run ```run.sh```**
 ```bash

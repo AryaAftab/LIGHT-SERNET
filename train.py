@@ -63,6 +63,11 @@ ap.add_argument("-it", "--input_type",
                 type=str,
                 help="type of input(mfcc, spectrogram, mel_spectrogram)")
 
+ap.add_argument("-c", "--cache",
+                default="disk",
+                type=str,
+                help="type of caching dataset(mfcc, spectrogram, mel_spectrogram)")
+
 args = vars(ap.parse_args())
 
 
@@ -72,6 +77,7 @@ audio_type = args["audio_type"]
 loss_name = args["loss_name"]
 verbose = args["verbose"]
 input_type = args["input_type"]
+cache = args["cache"]
 
 
 
@@ -123,13 +129,14 @@ for counter in range (hyperparameters.K_FOLD):
         callbacks += [ShowProgress(hyperparameters.EPOCHS)]
 
     
-    train_dataset, test_dataset = make_dataset_with_cache(dataset_name=dataset_name,
-                                                          filenames=Filenames,
-                                                          splited_index=Splited_Index,
-                                                          labels_list=Labels_list,
-                                                          index_selection_fold=counter,
-                                                          input_type=input_type,
-                                                          maker=True)
+    train_dataset, test_dataset = make_dataset(dataset_name=dataset_name,
+                                               filenames=Filenames,
+                                               splited_index=Splited_Index,
+                                               labels_list=Labels_list,
+                                               index_selection_fold=counter,
+                                               cache=cache,
+                                               input_type=input_type,
+                                               maker=True)
     
 
     model = models.Light_SERNet_V1(len(Labels_list), input_durations, input_type)
@@ -146,8 +153,8 @@ for counter in range (hyperparameters.K_FOLD):
     
     
     model.compile(optimizer=tf.keras.optimizers.Adam(hyperparameters.LEARNING_RATE),
-              loss=loss,
-              metrics=['accuracy']) 
+                  loss=loss,
+                  metrics=['accuracy']) 
     
     
     steps_per_epoch = (len(Filenames) - len(Splited_Index[counter])) // hyperparameters.BATCH_SIZE + 1
@@ -218,6 +225,11 @@ BuffY = tf.concat(BuffY, axis=0).numpy()
 
 
 model.set_weights(best_weights)
+###################### Save Best Model in keras format (Weight Precision : Float32) ##########################
+best_modelname_keras = f"model/{dataset_name}_{loss_name}_float32.h5"
+model.save(best_modelname_keras)
+##############################################################################################################
+
 ###################### Save Best Model in tflite format (Weight Precision : Float32) #########################
 best_modelname_float32 = f"model/{dataset_name}_{loss_name}_float32.tflite"
 save_float32(model, best_modelname_float32)

@@ -157,16 +157,17 @@ def split_dataset(dataset_name, audio_type="all"):
 
 
 
-def make_dataset_with_cache(dataset_name, filenames, splited_index, labels_list, index_selection_fold, input_type="mfcc", maker=False):
+def make_dataset(dataset_name, filenames, splited_index, labels_list, index_selection_fold, cache="disk", input_type="mfcc", maker=False):
 
-    cache_directory = f"{hyperparameters.BASE_DIRECTORY}/Cache/{dataset_name}"
-    os.system(f"rm -rf {cache_directory}")
+    if cache == "disk":
+        cache_directory = f"{hyperparameters.BASE_DIRECTORY}/Cache/{dataset_name}"
+        os.system(f"rm -rf {cache_directory}")
 
-    train_cache_directory = os.path.join(cache_directory, "train")
-    test_cache_directory = os.path.join(cache_directory, "test")
+        train_cache_directory = os.path.join(cache_directory, "train")
+        test_cache_directory = os.path.join(cache_directory, "test")
 
-    os.makedirs(train_cache_directory, exist_ok=True)
-    os.makedirs(test_cache_directory, exist_ok=True)
+        os.makedirs(train_cache_directory, exist_ok=True)
+        os.makedirs(test_cache_directory, exist_ok=True)
 
 
     test_index = splited_index[index_selection_fold]
@@ -179,12 +180,17 @@ def make_dataset_with_cache(dataset_name, filenames, splited_index, labels_list,
 
 
     train_dataset = preprocess_dataset(train_files, labels_list, input_type)
-    train_dataset = train_dataset.cache(train_cache_directory + "/file")
-
-
     test_dataset = preprocess_dataset(test_files, labels_list, input_type)
-    test_dataset = test_dataset.cache(test_cache_directory+ "/file")
-
+    if cache == "disk":
+        train_dataset = train_dataset.cache(train_cache_directory + "/file")
+        test_dataset = test_dataset.cache(test_cache_directory+ "/file")
+    elif cache == "ram":
+        train_dataset = train_dataset.cache()
+        test_dataset = test_dataset.cache()
+    elif cache== "None":
+        pass
+    else:
+        raise ValueError('cache not Valid!')
 
 
     train_dataset = train_dataset.shuffle(len(train_files)).repeat()
