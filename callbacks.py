@@ -46,7 +46,7 @@ class BestModelWeights(tf.keras.callbacks.Callback):
 
     def on_train_end(self, logs=None):
         self.model.set_weights(self.model_best_weights)
-        print(f"Best weights is set, Best Epoch was : {self.best_epoch}\n")
+        print(f"\nBest weights is set, Best Epoch was : {self.best_epoch}\n")
 	
 	
 	
