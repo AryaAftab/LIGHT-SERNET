@@ -207,7 +207,7 @@ for counter in range (hyperparameters.K_FOLD):
 
 
 ###################################### prepare the test part related to the best model ##########################################
-_, test_dataset = make_dataset_with_cache(dataset_name=dataset_name,
+_, test_dataset = make_dataset(dataset_name=dataset_name,
                                           filenames=Filenames,
                                           splited_index=Splited_Index,
                                           labels_list=Labels_list,

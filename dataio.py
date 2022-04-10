@@ -157,7 +157,7 @@ def split_dataset(dataset_name, audio_type="all"):
 
 
 
-def make_dataset(dataset_name, filenames, splited_index, labels_list, index_selection_fold, cache="disk", input_type="mfcc", maker=False):
+def make_dataset(dataset_name, filenames, splited_index, labels_list, index_selection_fold, cache="disk", input_type="mfcc", maker=True):
 
     if cache == "disk":
         cache_directory = f"{hyperparameters.BASE_DIRECTORY}/Cache/{dataset_name}"
@@ -193,12 +193,13 @@ def make_dataset(dataset_name, filenames, splited_index, labels_list, index_sele
         raise ValueError('cache not Valid!')
 
 
-    train_dataset = train_dataset.shuffle(len(train_files)).repeat()
+    train_dataset = train_dataset.shuffle(len(train_files))
     train_dataset = train_dataset.batch(hyperparameters.BATCH_SIZE).prefetch(AUTOTUNE)
     
     test_dataset = test_dataset.batch(hyperparameters.BATCH_SIZE).prefetch(AUTOTUNE)
 
     if maker: 
         list(test_dataset.as_numpy_iterator()) 
+        list(train_dataset.as_numpy_iterator()) 
 
     return train_dataset, test_dataset
