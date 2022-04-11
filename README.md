@@ -91,8 +91,8 @@ python train.py -dn "EMO-DB" \
                 -m True
 ```
 - Note 1: The best model are saved in the [model](./model) folder.
-- Note 2: The run tflite model you can just use ```tflite_runtime``` library.
-- Note 3: The run tflite model as a real-time application another **[repository](https://github.com/AryaAftab/RealTime-LIGHT-SERNET)** will be completed soon.
+- Note 2: To run tflite model you can just use ```tflite_runtime``` library. For using ```tflite_runtime``` library in this project, you need to build it with **TF OP support(Flex delegate)**. you can learn how to built Tenorflow Lite from source with this flag **[here](https://github.com/tensorflow/tensorflow/tree/master/tensorflow/lite/tools/pip_package)**.
+- Note 3: To run tflite model as a real-time application another **[repository](https://github.com/AryaAftab/RealTime-LIGHT-SERNET)** will be completed soon.
 
 ## Citation
 
