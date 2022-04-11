@@ -40,7 +40,7 @@ You only need to change the constants in the [hyperparameters.py](./hyperparamet
 ### 6. Strat training:
 Use the following code to train the model on the desired dataset, cost function, and input length(second).
 - Note 1: The input is automatically cut or padded to the desired size and stored in the [data](./data) folder.
-- Note 2: The best model are saved in the [result](./result) folder.
+- Note 2: The best model are saved in the [model](./model) folder.
 - Note 3: The results for the confusion matrix are saved in the [result](./result) folder.
 ```bash
 $ python train.py -dn {dataset_name} \
@@ -50,6 +50,7 @@ $ python train.py -dn {dataset_name} \
                   -v {verbose for training bar} \
                   -it {type of input(mfcc, spectrogram, mel_spectrogram)}
                   -c {type of cache(disk, ram, None)}
+                  -m {fuse mfcc feature extractor in exported tflite model}
 ```
 #### Example:
 
@@ -62,6 +63,7 @@ python train.py -dn "EMO-DB" \
                 -v 1 \
                 -it "mfcc"
                 -c "disk"
+                -m false
 ```
 
 IEMOCAP Dataset:
@@ -73,11 +75,24 @@ python train.py -dn "IEMOCAP" \
                 -v 1 \
                 -it "mfcc"
                 -c "disk"
+                -m false
 ```
 **Note : For all experiments just run ```run.sh```**
 ```bash
 sh run.sh
 ```
+
+## Fusing MFCC Extractor(New Feature)
+To run the model independently and without the need for the Tensorflow library, the MFCC feature extractor was added as a single layer to the beginning of the model. Then, The trained model was exported as a single file in the TensorFlow Lite format. The input of this model is raw sound in the form of a vector ```(1, sample_rate * input_duration)```.
+To train with fusing feature:
+```bash
+python train.py -dn "EMO-DB" \
+                -id 3 \
+                -m True
+```
+- Note 1: The best model are saved in the [model](./model) folder.
+- Note 2: The run tflite model you can just use ```tflite_runtime``` library.
+- Note 3: The run tflite model as a real-time application another **[repository](https://github.com/AryaAftab/RealTime-LIGHT-SERNET)** will be completed soon.
 
 ## Citation
 
