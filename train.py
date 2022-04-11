@@ -70,6 +70,11 @@ ap.add_argument("-c", "--cache",
                 type=str,
                 help="type of caching dataset(mfcc, spectrogram, mel_spectrogram)")
 
+ap.add_argument("-m", "--merge_tflite",
+                default=False,
+                type=bool,
+                help="do you want mfcc feature extractor to be merged in tflite model?")
+
 args = vars(ap.parse_args())
 
 
@@ -80,6 +85,7 @@ loss_name = args["loss_name"]
 verbose = args["verbose"]
 input_type = args["input_type"]
 cache = args["cache"]
+merge_tflite = args["merge_tflite"]
 
 
 
@@ -115,7 +121,7 @@ Filenames, Splited_Index, Labels_list = split_dataset(dataset_name, audio_type=a
 
 
 for counter in range (hyperparameters.K_FOLD):
-    print(40 * "*", f"Fold : {counter + 1}", 40 * "*")
+    print(44 * "*", f"Fold : {counter + 1}", 44 * "*")
     now = datetime.datetime.now()
     print(f"Time : [{now.hour} : {now.minute} : {now.second}]")
     start_time = time.time()
@@ -137,6 +143,7 @@ for counter in range (hyperparameters.K_FOLD):
                                                labels_list=Labels_list,
                                                index_selection_fold=counter,
                                                cache=cache,
+                                               merge_tflite=merge_tflite,
                                                input_type=input_type,
                                                maker=True)
     
@@ -159,9 +166,9 @@ for counter in range (hyperparameters.K_FOLD):
                   metrics=['accuracy']) 
     
     
-    steps_per_epoch = (len(Filenames) - len(Splited_Index[counter])) // hyperparameters.BATCH_SIZE + 1
+    #steps_per_epoch = (len(Filenames) - len(Splited_Index[counter])) // hyperparameters.BATCH_SIZE + 1
     history = model.fit(train_dataset,
-                        steps_per_epoch=steps_per_epoch,
+                        #steps_per_epoch=steps_per_epoch,
                         epochs=hyperparameters.EPOCHS,
                         validation_data=test_dataset,
                         callbacks=callbacks,
@@ -210,12 +217,14 @@ for counter in range (hyperparameters.K_FOLD):
 
 ###################################### prepare the test part related to the best model ##########################################
 _, test_dataset = make_dataset(dataset_name=dataset_name,
-                                          filenames=Filenames,
-                                          splited_index=Splited_Index,
-                                          labels_list=Labels_list,
-                                          index_selection_fold=best_counter,
-                                          input_type=input_type,
-                                          maker=True)
+                               filenames=Filenames,
+                               splited_index=Splited_Index,
+                               labels_list=Labels_list,
+                               index_selection_fold=best_counter,
+                               cache=cache,
+                               merge_tflite=merge_tflite,
+                               input_type=input_type,
+                               maker=True)
 BuffX = []
 BuffY = []
 for buff in test_dataset:
@@ -227,36 +236,69 @@ BuffY = tf.concat(BuffY, axis=0).numpy()
 
 
 model.set_weights(best_weights)
-###################### Save Best Model in keras format (Weight Precision : Float32) ##########################
+###################### Save Best Model in keras format (Weight Precision : Float32) ###############################
 best_modelname_keras = f"model/{dataset_name}_{loss_name}_float32.h5"
 model.save(best_modelname_keras)
-##############################################################################################################
 
-###################### Save Best Model in tflite format (Weight Precision : Float32) #########################
+if merge_tflite:
+    mfcc_extractor = MFCCExtractor(hyperparameters.NUM_MEL_BINS,
+                                   hyperparameters.SAMPLE_RATE,
+                                   hyperparameters.LOWER_EDGE_HERTZ,
+                                   hyperparameters.UPPER_EDGE_HERTZ,
+                                   hyperparameters.FRAME_LENGTH,
+                                   hyperparameters.FRAME_STEP,
+                                   hyperparameters.N_MFCC)
+
+    merged_model = tf.keras.models.Sequential(
+        [
+        tf.keras.layers.Input(shape=(int(input_durations * hyperparameters.SAMPLE_RATE))),
+        tf.keras.layers.Lambda(lambda x: tf.transpose(x, perm=[1, 0])),
+        mfcc_extractor,
+        model
+        ]
+    )
+###################################################################################################################
+
+###################### Save Best Model in tflite format (Weight Precision : Float32) ##############################
 best_modelname_float32 = f"model/{dataset_name}_{loss_name}_float32.tflite"
-save_float32(model, best_modelname_float32)
-
+save_float32(model, best_modelname_float32, merge_tflite=False)
 evaluate_model(best_modelname_float32, "float32", BuffX, BuffY)
-##############################################################################################################
 
-###################### Save Best Model in tflite format (Weight Precision : Float16) #########################
+if merge_tflite and (input_type == "mfcc"):
+    best_modelname_float32 = f"model/{dataset_name}_fuse_{loss_name}_float32.tflite"
+    save_float32(merged_model, best_modelname_float32, merge_tflite=True)
+
+print("..........................................................................................................")
+###################################################################################################################
+
+###################### Save Best Model in tflite format (Weight Precision : Float16) ##############################
 best_modelname_float16 = f"model/{dataset_name}_{loss_name}_float16.tflite"
-save_float16(model, best_modelname_float16)
-
+save_float16(model, best_modelname_float16, merge_tflite=False)
 evaluate_model(best_modelname_float16, "float16", BuffX, BuffY)
-##############################################################################################################
 
-###################### Save Best Model in tflite format (Weight Precision : Int8) ############################
+if merge_tflite and (input_type == "mfcc"):
+    best_modelname_float16 = f"model/{dataset_name}_fuse_{loss_name}_float16.tflite"
+    save_float16(merged_model, best_modelname_float16, merge_tflite=True)
+
+print("..........................................................................................................")
+###################################################################################################################
+
+###################### Save Best Model in tflite format (Weight Precision : Int8) #################################
 best_modelname_int8 = f"model/{dataset_name}_{loss_name}_int8.tflite"
-save_int8(model, best_modelname_int8)
-
+save_int8(model, best_modelname_int8, merge_tflite=False)
 evaluate_model(best_modelname_int8, "int8", BuffX, BuffY)
-##############################################################################################################
+
+if merge_tflite and (input_type == "mfcc"):
+    best_modelname_int8 = f"model/{dataset_name}_fuse_{loss_name}_int8.tflite"
+    save_int8(merged_model, best_modelname_int8, merge_tflite=True)
+
+print("..........................................................................................................")
+###################################################################################################################
 
 
 
 
-########################## Plot Confusion Matrix (Weight Precision : Float32) ################################
+############################# Plot Confusion Matrix (Weight Precision : Float32) ##################################
 Report = classification_report(Actual_targets,
                                Predicted_targets,
                                target_names=list(Labels_list),
@@ -278,4 +320,4 @@ plot_confusion_matrix(cm, list(Labels_list), normalize=True)
 plt.savefig(f"result/{dataset_name}_{loss_name}_TotalConfusionMatrixNormalized.pdf", bbox_inches='tight')
 #plt.show()
 
-##############################################################################################################
+##################################################################################################################
