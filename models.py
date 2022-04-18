@@ -28,7 +28,7 @@ def Light_SERNet_V1(output_class,
         number_of_feature = hyperparameters.NUM_MEL_BINS
         number_of_channel = 1
     else:
-        raise ValueError('input_type not Valid!')
+        raise ValueError('input_type not valid!')
 
 
     body_input = layers.Input(shape=(number_of_frame, number_of_feature, number_of_channel))
@@ -86,3 +86,67 @@ def Light_SERNet_V1(output_class,
     body_model = Model(inputs=body_input, outputs=body_output)
 
     return body_model
+
+
+
+class MFCCExtractor(tf.keras.layers.Layer):
+    def __init__(self,
+                    NUM_MEL_BINS,
+                    SAMPLE_RATE,
+                    LOWER_EDGE_HERTZ,
+                    UPPER_EDGE_HERTZ,
+                    FRAME_LENGTH,
+                    FRAME_STEP,
+                    N_MFCC,
+                    **kwargs):
+        super(MFCCExtractor, self).__init__(**kwargs)
+
+        self.NUM_MEL_BINS = NUM_MEL_BINS
+        self.SAMPLE_RATE = SAMPLE_RATE
+        self.LOWER_EDGE_HERTZ = LOWER_EDGE_HERTZ
+        self.UPPER_EDGE_HERTZ = UPPER_EDGE_HERTZ
+
+        self.FRAME_LENGTH = FRAME_LENGTH
+        self.FRAME_STEP = FRAME_STEP
+
+        self.N_MFCC = N_MFCC
+
+
+    def get_mfcc(self, waveform, clip_value=10):
+        waveform = tf.cast(waveform, tf.float32)
+        spectrogram = tf.raw_ops.AudioSpectrogram(input=waveform,
+                                                    window_size=self.FRAME_LENGTH,
+                                                    stride=self.FRAME_STEP,
+                                                    magnitude_squared=True,
+                                                    )
+
+
+        mfcc = tf.raw_ops.Mfcc(spectrogram=spectrogram,
+                                sample_rate=hyperparameters.SAMPLE_RATE,
+                                upper_frequency_limit=hyperparameters.UPPER_EDGE_HERTZ,
+                                lower_frequency_limit=hyperparameters.LOWER_EDGE_HERTZ,
+                                filterbank_channel_count=hyperparameters.NUM_MEL_BINS,
+                                dct_coefficient_count=hyperparameters.N_MFCC,
+                                )
+
+        return tf.clip_by_value(mfcc, -clip_value, clip_value)
+
+
+    def call(self, inputs):
+        outputs = self.get_mfcc(inputs)
+
+        return tf.expand_dims(outputs, -1)
+
+
+    def get_config(self):
+        config = super(MFCCExtractor, self).get_config()
+        config.update({
+            "NUM_MEL_BINS": self.NUM_MEL_BINS,
+            "SAMPLE_RATE": self.SAMPLE_RATE,
+            "LOWER_EDGE_HERTZ": self.LOWER_EDGE_HERTZ,
+            "UPPER_EDGE_HERTZ": self.UPPER_EDGE_HERTZ,
+            "FRAME_LENGTH": self.FRAME_LENGTH,
+            "FRAME_STEP": self.FRAME_STEP,
+            "N_MFCC": self.N_MFCC,
+        })
+        return config

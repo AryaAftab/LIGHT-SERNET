@@ -5,6 +5,7 @@ import numpy as np
 
 import hyperparameters
 from filter_dataset import *
+from models import MFCCExtractor
 
 
 
@@ -82,68 +83,6 @@ def get_label_id(label, labels_list):
     return label_id
 
 
-class MFCCExtractor(tf.keras.layers.Layer):
-    def __init__(self,
-                    NUM_MEL_BINS,
-                    SAMPLE_RATE,
-                    LOWER_EDGE_HERTZ,
-                    UPPER_EDGE_HERTZ,
-                    FRAME_LENGTH,
-                    FRAME_STEP,
-                    N_MFCC,
-                    **kwargs):
-        super(MFCCExtractor, self).__init__(**kwargs)
-
-        self.NUM_MEL_BINS = NUM_MEL_BINS
-        self.SAMPLE_RATE = SAMPLE_RATE
-        self.LOWER_EDGE_HERTZ = LOWER_EDGE_HERTZ
-        self.UPPER_EDGE_HERTZ = UPPER_EDGE_HERTZ
-
-        self.FRAME_LENGTH = FRAME_LENGTH
-        self.FRAME_STEP = FRAME_STEP
-
-        self.N_MFCC = N_MFCC
-
-
-    def get_mfcc(self, waveform, clip_value=10):
-        waveform = tf.cast(waveform, tf.float32)
-        spectrogram = tf.raw_ops.AudioSpectrogram(input=waveform,
-                                                    window_size=self.FRAME_LENGTH,
-                                                    stride=self.FRAME_STEP,
-                                                    magnitude_squared=True,
-                                                    )
-
-
-        mfcc = tf.raw_ops.Mfcc(spectrogram=spectrogram,
-                                sample_rate=hyperparameters.SAMPLE_RATE,
-                                upper_frequency_limit=hyperparameters.UPPER_EDGE_HERTZ,
-                                lower_frequency_limit=hyperparameters.LOWER_EDGE_HERTZ,
-                                filterbank_channel_count=hyperparameters.NUM_MEL_BINS,
-                                dct_coefficient_count=hyperparameters.N_MFCC,
-                                )
-
-        return tf.clip_by_value(mfcc, -clip_value, clip_value)
-
-
-    def call(self, inputs):
-        outputs = self.get_mfcc(inputs)
-
-        return tf.expand_dims(outputs, -1)
-
-
-    def get_config(self):
-        config = super(MFCCExtractor, self).get_config()
-        config.update({
-            "NUM_MEL_BINS": self.NUM_MEL_BINS,
-            "SAMPLE_RATE": self.SAMPLE_RATE,
-            "LOWER_EDGE_HERTZ": self.LOWER_EDGE_HERTZ,
-            "UPPER_EDGE_HERTZ": self.UPPER_EDGE_HERTZ,
-            "FRAME_LENGTH": self.FRAME_LENGTH,
-            "FRAME_STEP": self.FRAME_STEP,
-            "N_MFCC": self.N_MFCC,
-        })
-        return config
-
 
 def get_input_and_label_id(audio, label, labels_list, input_type="mfcc", merge_tflite=False):
     label_id = get_label_id(label, labels_list)
@@ -174,7 +113,7 @@ def get_input_and_label_id(audio, label, labels_list, input_type="mfcc", merge_t
 
         return mfcc, label_id
     else:
-        raise ValueError('input_type not Valid!')
+        raise ValueError('input_type not valid!')
 
 
 
@@ -185,8 +124,6 @@ def preprocess_dataset(files, labels_list, input_type="mfcc", merge_tflite=False
         get_input_and_label_id(x, y, labels_list, input_type, merge_tflite),  num_parallel_calls=AUTOTUNE)
 
     return output_ds
-
-
 
 
 
@@ -218,8 +155,6 @@ def split_dataset(dataset_name, audio_type="all"):
         splited_index = seperate_speaker_id_emodb(filenames)
         
     return filenames, splited_index, labels_list
-
-
 
 
 
@@ -256,7 +191,7 @@ def make_dataset(dataset_name, filenames, splited_index, labels_list, index_sele
     elif cache== "None":
         pass
     else:
-        raise ValueError('cache not Valid!')
+        raise ValueError('cache method not valid!')
 
 
     train_dataset = train_dataset.shuffle(len(train_files))

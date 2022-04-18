@@ -46,7 +46,7 @@ class BestModelWeights(tf.keras.callbacks.Callback):
 
     def on_train_end(self, logs=None):
         self.model.set_weights(self.model_best_weights)
-        print(f"\nBest weights is set, Best Epoch was : {self.best_epoch}\n")
+        print(f"\nBest weights is set, Best Epoch was : {self.best_epoch+1}\n")
 	
 	
 	
@@ -67,7 +67,6 @@ class ShowProgress(tf.keras.callbacks.Callback):
 
 
 
-
 def LearningRateScheduler():
 	def scheduler(epoch, lr):
 	    if epoch < hyperparameters.LEARNING_RATE_DECAY_STRATPOINT:
@@ -77,8 +76,6 @@ def LearningRateScheduler():
 	            lr = lr * tf.math.exp(hyperparameters.LEARNING_RATE_DECAY_PARAMETERS)
 	    return lr
 	return tf.keras.callbacks.LearningRateScheduler(scheduler)
-
-
 
 
 

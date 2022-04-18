@@ -156,7 +156,7 @@ for counter in range (hyperparameters.K_FOLD):
     elif loss_name == "focal":
     	loss = SparseCategoricalFocalLoss(gamma=hyperparameters.GAMMA)
     else:
-    	raise ValueError('Loss name not Valid!')
+    	raise ValueError('Loss name not valid!')
 
 
     
