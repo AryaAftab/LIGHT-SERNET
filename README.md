@@ -34,10 +34,12 @@ $ pip install -r requirements.txt
 * Download **[EMO-DB](http://emodb.bilderbar.info/download/download.zip)** and **[IEMOCAP](https://sail.usc.edu/iemocap/iemocap_release.htm)**(requires permission to access) datasets
 * extract them in [data](./data) folder
 
+**Note:** For using **IEMOCAP** dataset, please follow issue [#3](../../issues/3). 
+
 ### 4. Set hyperparameters and training config :
 You only need to change the constants in the [hyperparameters.py](./hyperparameters.py) to set the hyperparameters and the training config.
 
-### 6. Strat training:
+### 5. Strat training:
 Use the following code to train the model on the desired dataset, cost function, and input length(second).
 - Note 1: The input is automatically cut or padded to the desired size and stored in the [data](./data) folder.
 - Note 2: The best model are saved in the [model](./model) folder.
@@ -98,10 +100,12 @@ python train.py -dn "EMO-DB" \
 
 If you find our code useful for your research, please consider citing:
 ```bibtex
-@article{aftab2021light,
+@inproceedings{aftab2022light,
   title={Light-SERNet: A lightweight fully convolutional neural network for speech emotion recognition},
   author={Aftab, Arya and Morsali, Alireza and Ghaemmaghami, Shahrokh and Champagne, Benoit},
-  journal={arXiv preprint arXiv:2110.03435},
-  year={2021}
+  booktitle={ICASSP 2022-2022 IEEE International Conference on Acoustics, Speech and Signal Processing (ICASSP)},
+  pages={6912--6916},
+  year={2022},
+  organization={IEEE}
 }
 ```
