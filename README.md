@@ -50,8 +50,8 @@ $ python train.py -dn {dataset_name} \
                   -at {audio_type} \
                   -ln {cost function name} \
                   -v {verbose for training bar} \
-                  -it {type of input(mfcc, spectrogram, mel_spectrogram)}
-                  -c {type of cache(disk, ram, None)}
+                  -it {type of input(mfcc, spectrogram, mel_spectrogram)} \
+                  -c {type of cache(disk, ram, None)} \
                   -m {fuse mfcc feature extractor in exported tflite model}
 ```
 #### Example:
@@ -63,8 +63,8 @@ python train.py -dn "EMO-DB" \
                 -at "all" \
                 -ln "focal" \
                 -v 1 \
-                -it "mfcc"
-                -c "disk"
+                -it "mfcc" \
+                -c "disk" \
                 -m false
 ```
 
@@ -75,8 +75,8 @@ python train.py -dn "IEMOCAP" \
                 -at "impro" \
                 -ln "cross_entropy" \
                 -v 1 \
-                -it "mfcc"
-                -c "disk"
+                -it "mfcc" \
+                -c "disk" \
                 -m false
 ```
 **Note : For all experiments just run ```run.sh```**
